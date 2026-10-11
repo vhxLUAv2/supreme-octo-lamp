@@ -4,7 +4,8 @@ A client-side Fabric mod foundation for a configurable Minecraft PvP client.
 
 ## Current foundation
 
-- Fabric client mod targeting Minecraft Java 26.3 and Java 25.
+- Fabric client mod targeting Minecraft Java 26.2, Fabric Loader 0.19.5, and Java 25.
+- Fabric API 0.161.0+26.2.
 - Dark ClickGUI opened with **Right Shift**.
 - Module registry with click-to-toggle rows.
 - **Target Preview**: when enabled, selects the nearest visible, alive, non-spectator player within range. It does not rotate the camera or send attack inputs.
