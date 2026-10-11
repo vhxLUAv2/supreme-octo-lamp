@@ -1,5 +1,6 @@
 package dev.vhx.client.gui;
 
+import dev.vhx.client.config.ConfigManager;
 import dev.vhx.client.module.ClientModule;
 import dev.vhx.client.module.ModuleManager;
 import dev.vhx.client.module.combat.MobAuraModule;
@@ -29,14 +30,14 @@ public final class ClickGuiScreen extends Screen {
     @Override
     protected void init() {
         List<ClientModule> entries = modules.getModules();
-        int panelHeight = 46 + entries.size() * MODULE_ROW_HEIGHT + 151;
+        int panelHeight = 46 + entries.size() * MODULE_ROW_HEIGHT + 190;
         int left = (width - PANEL_WIDTH) / 2;
         int top = Math.max(12, (height - panelHeight) / 2);
         int settingsY = top + 46 + entries.size() * MODULE_ROW_HEIGHT + 6;
         int buttonX = left + 16;
         int buttonWidth = PANEL_WIDTH - 32;
 
-        // This disabled widget paints the panel first; the controls are layered above it.
+        // Decorative panel is added first so interactive controls render above it.
         addRenderableWidget(new PanelBackgroundWidget(
                 left, top, PANEL_WIDTH, panelHeight, settingsY - top, font));
 
@@ -46,6 +47,7 @@ public final class ClickGuiScreen extends Screen {
             addRenderableWidget(Button.builder(moduleLabel(module), button -> {
                 module.toggle();
                 button.setMessage(moduleLabel(module));
+                ConfigManager.save(modules);
             }).bounds(buttonX, y, buttonWidth, 20).build());
         }
 
@@ -60,26 +62,36 @@ public final class ClickGuiScreen extends Screen {
             addRenderableWidget(Button.builder(settingLabel("Passive mobs", aura.targetsPassive()), button -> {
                 aura.setTargetPassive(!aura.targetsPassive());
                 button.setMessage(settingLabel("Passive mobs", aura.targetsPassive()));
+                ConfigManager.save(modules);
             }).bounds(buttonX, settingsY + 17, halfWidth, 20).build());
 
             addRenderableWidget(Button.builder(settingLabel("Hostile mobs", aura.targetsHostile()), button -> {
                 aura.setTargetHostile(!aura.targetsHostile());
                 button.setMessage(settingLabel("Hostile mobs", aura.targetsHostile()));
+                ConfigManager.save(modules);
             }).bounds(buttonX + halfWidth + 8, settingsY + 17, halfWidth, 20).build());
 
             addRenderableWidget(Button.builder(settingLabel("Cooldown bypass", aura.isCooldownBypassEnabled()), button -> {
                 aura.setCooldownBypass(!aura.isCooldownBypassEnabled());
                 button.setMessage(settingLabel("Cooldown bypass", aura.isCooldownBypassEnabled()));
+                ConfigManager.save(modules);
             }).bounds(buttonX, settingsY + 41, buttonWidth, 20).build());
 
             addRenderableWidget(Button.builder(settingLabel("Range bypass", aura.isRangeBypassEnabled()), button -> {
                 aura.setRangeBypass(!aura.isRangeBypassEnabled());
                 button.setMessage(settingLabel("Range bypass", aura.isRangeBypassEnabled()));
+                ConfigManager.save(modules);
             }).bounds(buttonX, settingsY + 65, buttonWidth, 20).build());
+
+            addRenderableWidget(Button.builder(rangeLabel(aura), button -> {
+                aura.setRange(aura.getRange() >= 6.0 ? 1.0 : aura.getRange() + 0.5);
+                button.setMessage(rangeLabel(aura));
+                ConfigManager.save(modules);
+            }).bounds(buttonX, settingsY + 89, buttonWidth, 20).build());
         }
 
         addRenderableWidget(Button.builder(Component.literal("Close  (Esc)"), button -> onClose())
-                .bounds(buttonX, settingsY + 112, buttonWidth, 20).build());
+                .bounds(buttonX, settingsY + 139, buttonWidth, 20).build());
     }
 
     private static Component moduleLabel(ClientModule module) {
@@ -88,6 +100,11 @@ public final class ClickGuiScreen extends Screen {
 
     private static Component settingLabel(String name, boolean enabled) {
         return Component.literal(name + (enabled ? ": ON" : ": OFF"));
+    }
+
+    private static Component rangeLabel(MobAuraModule aura) {
+        return Component.literal("Attack range: " + String.format(java.util.Locale.ROOT, "%.1f", aura.getRange())
+                + " blocks  (click to cycle)");
     }
 
     @Override
@@ -115,13 +132,13 @@ public final class ClickGuiScreen extends Screen {
             graphics.fill(x, y, x + width, y + height, PANEL);
             graphics.fill(x, y, x + width, y + 3, ACCENT);
             graphics.text(panelFont, "SUPREME OCTO LAMP", x + 16, y + 13, TEXT, true);
-            graphics.text(panelFont, "MOB AURA  /  MODULE SETTINGS", x + 16, y + 29, MUTED, true);
+            graphics.text(panelFont, "MODULES  /  CONFIGURATION", x + 16, y + 29, MUTED, true);
             graphics.fill(x + 12, y + 39, x + width - 12, y + 40, 0xFF2A2D36);
             graphics.text(panelFont, "Target filters", x + 16, y + settingsOffset + 2, TEXT, true);
-            graphics.text(panelFont, "Searches up to 16 blocks when Range bypass is ON.", x + 16,
-                    y + settingsOffset + 89, MUTED, false);
-            graphics.text(panelFont, "The server can still reject attacks outside its allowed reach.", x + 16,
-                    y + settingsOffset + 101, MUTED, false);
+            graphics.text(panelFont, "Settings save automatically to your Minecraft config folder.", x + 16,
+                    y + settingsOffset + 116, MUTED, false);
+            graphics.text(panelFont, "Range bypass expands search only; vanilla reach still applies.", x + 16,
+                    y + settingsOffset + 128, MUTED, false);
         }
 
         @Override

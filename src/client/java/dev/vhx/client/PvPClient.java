@@ -1,6 +1,7 @@
 package dev.vhx.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.vhx.client.config.ConfigManager;
 import dev.vhx.client.gui.ClickGuiScreen;
 import dev.vhx.client.module.ModuleManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -27,6 +28,8 @@ public final class PvPClient implements ClientModInitializer {
                 category));
 
         MODULES.registerDefaults();
+        ConfigManager.load(MODULES);
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (clickGuiKey.consumeClick()) {
                 if (client.player == null) {

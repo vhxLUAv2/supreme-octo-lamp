@@ -1,18 +1,20 @@
 # Supreme Octo Lamp
 
-A client-side Fabric mod foundation for a configurable Minecraft PvP client.
+A client-side Fabric mod foundation for a configurable Minecraft client focused on single-player worlds.
 
 ## Current features
 
 - Minecraft Java 26.2, Fabric Loader 0.19.5, Fabric API 0.161.0+26.2, and Java 25.
 - Dark ClickGUI opened by the configurable **Right Shift** key binding.
 - Module registry with click-to-toggle rows.
+- **Persistent settings**: module enabled states and Mob Aura settings are saved to `config/supreme-octo-lamp.properties`.
 - **Target Preview**: identifies the nearest eligible player; it does not aim or attack.
 - **Mob Aura**: attacks non-player mobs with separate Passive and Hostile filters.
 - **Attack Cooldown Bypass**: skips the client's vanilla attack-strength gate and sends attack attempts every client tick.
-- **Range Bypass**: expands client-side target search to 16 blocks; without server cooperation, hits outside server-approved reach can still be rejected.
+- **Range Bypass**: expands client-side target search to 16 blocks; it does not change vanilla's actual interaction reach.
+- **Mob Aura range control**: click the range button to cycle from 1.0 to 6.0 blocks in 0.5-block increments.
 
-The player entity is not eligible for Mob Aura. In the selector, vanilla `MobCategory.MONSTER` entities count as Hostile; other mob categories count as Passive. Automated combat should only be used where the server explicitly permits it.
+The player entity is not eligible for Mob Aura. In the selector, vanilla `MobCategory.MONSTER` entities count as Hostile; other mob categories count as Passive. Range bypass affects target search only and cannot make vanilla accept attacks outside the game's valid reach.
 
 ## Build
 
