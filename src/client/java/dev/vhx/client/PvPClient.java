@@ -7,7 +7,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 public final class PvPClient implements ClientModInitializer {
     public static final ModuleManager MODULES = new ModuleManager();
@@ -17,12 +18,12 @@ public final class PvPClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         KeyMapping.Category category = KeyMapping.Category.register(
-                ResourceLocation.fromNamespaceAndPath("supreme_octo_lamp", "client"));
+                Identifier.fromNamespaceAndPath("supreme_octo_lamp", "client"));
 
         clickGuiKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.supreme_octo_lamp.click_gui",
                 InputConstants.Type.KEYSYM,
-                InputConstants.KEY_RIGHT_SHIFT,
+                GLFW.GLFW_KEY_RIGHT_SHIFT,
                 category));
 
         MODULES.registerDefaults();
