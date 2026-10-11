@@ -5,9 +5,13 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
-base { archivesName = 'supreme-octo-lamp' }
+base {
+    archivesName = 'supreme-octo-lamp'
+}
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -25,12 +29,17 @@ loom {
     }
 }
 
+def modVersion = project.version.toString()
 processResources {
-    inputs.property "version", project.version
-    filesMatching("fabric.mod.json") { expand "version": project.version }
+    inputs.property("version", modVersion)
+    filesMatching("fabric.mod.json") {
+        expand("version": modVersion)
+    }
 }
 
-tasks.withType(JavaCompile).configureEach { options.release = 25 }
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_25
