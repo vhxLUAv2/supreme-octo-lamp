@@ -2,6 +2,9 @@ package dev.vhx.client.module;
 
 import dev.vhx.client.module.combat.MobAuraModule;
 import dev.vhx.client.module.combat.TargetPreviewModule;
+import dev.vhx.client.module.player.AutoToolModule;
+import dev.vhx.client.module.render.FullbrightModule;
+import dev.vhx.client.module.render.ZoomModule;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +17,9 @@ public final class ModuleManager {
         if (modules.isEmpty()) {
             register(new TargetPreviewModule());
             register(new MobAuraModule());
+            register(new FullbrightModule());
+            register(new ZoomModule());
+            register(new AutoToolModule());
         }
     }
 
