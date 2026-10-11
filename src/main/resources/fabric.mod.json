@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "supreme_octo_lamp",
+  "version": "${version}",
+  "name": "Supreme Octo Lamp",
+  "description": "A modular Fabric client foundation with a dark ClickGUI.",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.vhx.client.PvPClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
