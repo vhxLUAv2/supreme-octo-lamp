@@ -5,19 +5,25 @@ import java.util.Comparator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
 
 /**
- * Automatically attacks nearby non-player mobs.
- *
- * The target type is intentionally Mob, not Player or a generic Entity. This
- * keeps player entities outside this module's targeting path.
+ * Attacks selected non-player mobs. Client-side options do not override
+ * reach or attack validation performed by the connected server.
  */
 public final class MobAuraModule extends ClientModule {
-    private double range = 3.5;
+    private static final double DEFAULT_RANGE = 3.5;
+    private static final double EXTENDED_SEARCH_RANGE = 16.0;
+
+    private double range = DEFAULT_RANGE;
+    private boolean targetPassive = true;
+    private boolean targetHostile = true;
+    private boolean cooldownBypass = true;
+    private boolean rangeBypass = true;
     private Mob target;
 
     public MobAuraModule() {
-        super("Mob Aura", "Attacks nearby non-player mobs only.");
+        super("Mob Aura", "Automatically attacks selected non-player mobs.");
     }
 
     @Override
@@ -27,15 +33,26 @@ public final class MobAuraModule extends ClientModule {
             return;
         }
 
+        if (!targetPassive && !targetHostile) {
+            target = null;
+            return;
+        }
+
+        double effectiveRange = rangeBypass ? EXTENDED_SEARCH_RANGE : range;
         target = client.level.getEntitiesOfClass(
                         Mob.class,
-                        client.player.getBoundingBox().inflate(range),
-                        candidate -> isValidTarget(client, candidate))
+                        client.player.getBoundingBox().inflate(effectiveRange),
+                        candidate -> isValidTarget(client, candidate, effectiveRange))
                 .stream()
                 .min(Comparator.comparingDouble(candidate -> client.player.distanceToSqr(candidate)))
                 .orElse(null);
 
-        if (target == null || client.player.getAttackStrengthScale(0.5F) < 0.95F) {
+        if (target == null) {
+            return;
+        }
+
+        // This bypasses only the client's attack-strength gate. Server rules still apply.
+        if (!cooldownBypass && client.player.getAttackStrengthScale(0.5F) < 0.95F) {
             return;
         }
 
@@ -43,13 +60,21 @@ public final class MobAuraModule extends ClientModule {
         client.player.swing(InteractionHand.MAIN_HAND);
     }
 
-    private boolean isValidTarget(Minecraft client, Mob candidate) {
+    private boolean isValidTarget(Minecraft client, Mob candidate, double effectiveRange) {
         if (candidate.isRemoved() || !candidate.isAlive() || candidate.isInvisible()) {
             return false;
         }
 
-        // Mob is the non-player mob base class; player entities are never candidates.
-        return client.player.distanceToSqr(candidate) <= range * range
+        // Mob excludes Player. Vanilla MONSTER category defines the hostile selection.
+        boolean hostile = candidate.getType().getCategory() == MobCategory.MONSTER;
+        if (hostile && !targetHostile) {
+            return false;
+        }
+        if (!hostile && !targetPassive) {
+            return false;
+        }
+
+        return client.player.distanceToSqr(candidate) <= effectiveRange * effectiveRange
                 && client.player.hasLineOfSight(candidate);
     }
 
@@ -59,6 +84,42 @@ public final class MobAuraModule extends ClientModule {
 
     public void setRange(double range) {
         this.range = Math.max(1.0, Math.min(6.0, range));
+    }
+
+    public boolean targetsPassive() {
+        return targetPassive;
+    }
+
+    public void setTargetPassive(boolean targetPassive) {
+        this.targetPassive = targetPassive;
+    }
+
+    public boolean targetsHostile() {
+        return targetHostile;
+    }
+
+    public void setTargetHostile(boolean targetHostile) {
+        this.targetHostile = targetHostile;
+    }
+
+    public boolean isCooldownBypassEnabled() {
+        return cooldownBypass;
+    }
+
+    public void setCooldownBypass(boolean cooldownBypass) {
+        this.cooldownBypass = cooldownBypass;
+    }
+
+    public boolean isRangeBypassEnabled() {
+        return rangeBypass;
+    }
+
+    public void setRangeBypass(boolean rangeBypass) {
+        this.rangeBypass = rangeBypass;
+    }
+
+    public double getEffectiveRange() {
+        return rangeBypass ? EXTENDED_SEARCH_RANGE : range;
     }
 
     public Mob getTarget() {
