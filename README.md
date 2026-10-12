@@ -25,3 +25,10 @@ gradle build
 ```
 
 The distributable JAR is written to `build/libs/`. GitHub Actions builds the project and uploads the JAR as an artifact.
+
+
+## Open-source module integrations
+
+This project includes adapted module implementations based on Wurst7 and Meteor Client: Auto Tool and Fullbright are adapted from Wurst7, and Zoom is adapted from Meteor Client. Source attribution and upstream snapshot references are documented in [UPSTREAMS.md](UPSTREAMS.md). The project is licensed under GNU GPL-3.0; see [LICENSE](LICENSE).
+
+Open the ClickGUI with **Right Shift** and toggle the modules. Auto Tool selects a hotbar tool for the targeted block and restores the prior slot when the block is no longer targeted. Fullbright sets the vanilla brightness option to its maximum supported value. Zoom temporarily sets the FOV to 30 and restores the previous value when disabled.
